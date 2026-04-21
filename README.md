@@ -1,6 +1,6 @@
 # htmly-media-upload
 
-Native PDF, audio and video upload support for [HTMLy](https://www.htmly.com/) v3.1.1+.
+Native PDF, audio and video upload support for [HTMLy](https://github.com/danpros/htmly) v3.1.1+.
 
 Adds an upload button directly to the HTMLy post editor toolbar. Uploaded files are stored in `content/files/` and are automatically included in HTMLy's built-in backup.
 
