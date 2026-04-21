@@ -1,0 +1,117 @@
+<!--
+    htmly-media-upload – Editor Patch
+    ==================================
+    @package  htmly-media-upload
+    @author   TestDesk
+    @link     https://github.com/testdesk/htmly-media-upload
+    @version  1.0.0
+    @requires HTMLy v3.1.1+
+    @license  GPL-2.0
+
+    INSTALLATION
+    ------------
+    Apply this patch to ALL FOUR of the following files in your HTMLy installation:
+
+      system/admin/views/add-content.html.php
+      system/admin/views/edit-content.html.php
+      system/admin/views/add-page.html.php
+      system/admin/views/edit-page.html.php
+
+    Find this line in each file:
+
+      <div id="wmd-button-bar" class="wmd-button-bar"></div>
+
+    Insert EVERYTHING below directly after that line.
+-->
+
+<div id="htmly-media-upload-bar" style="margin: 4px 0 2px 0;">
+    <label class="btn btn-sm btn-secondary" for="htmly-file-input"
+           title="Upload PDF / Audio / Video" style="cursor:pointer; margin-bottom:0;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             style="vertical-align:middle; margin-right:4px;">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        PDF / Audio / Video
+    </label>
+    <input type="file"
+           id="htmly-file-input"
+           accept=".pdf,.mp3,.ogg,.wav,.aac,.flac,.m4a,.mp4,.webm,.ogv,.mov"
+           style="display:none;">
+    <span id="htmly-upload-status" style="margin-left:8px; font-size:0.85em; color:#666;"></span>
+</div>
+
+<script>
+(function () {
+    var fileInput  = document.getElementById('htmly-file-input');
+    var statusSpan = document.getElementById('htmly-upload-status');
+
+    if (!fileInput) return;
+
+    fileInput.addEventListener('change', function () {
+        var file = this.files[0];
+        if (!file) return;
+
+        statusSpan.textContent = 'Uploading...';
+        statusSpan.style.color = '#666';
+
+        var formData = new FormData();
+        formData.append('file', file);
+
+        fetch('/upload-file.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data.error && data.error !== 0) {
+                statusSpan.textContent = 'Error: ' + data.error;
+                statusSpan.style.color = '#c0392b';
+                return;
+            }
+
+            var tag  = '';
+            var path = data.path;
+            var name = file.name.replace(/\.[^.]+$/, '');
+
+            if (data.type === 'pdf') {
+                tag = '<a href="' + path + '" target="_blank">' + name + '</a>';
+            } else if (data.type === 'audio') {
+                tag = '<audio controls>\n  <source src="' + path + '" type="audio/' + data.ext + '">\n</audio>';
+            } else if (data.type === 'video') {
+                tag = '<video controls style="max-width:100%">\n  <source src="' + path + '" type="video/' + data.ext + '">\n</video>';
+            }
+
+            // Insert tag at cursor position in the Markdown editor
+            var editor = document.getElementById('wmd-input');
+            if (editor) {
+                var pos    = editor.selectionStart || editor.value.length;
+                var before = editor.value.substring(0, pos);
+                var after  = editor.value.substring(pos);
+                var nl     = (before.length > 0 && before.slice(-1) !== '\n') ? '\n\n' : '';
+                editor.value = before + nl + tag + '\n\n' + after;
+                var newPos = (before + nl + tag + '\n\n').length;
+                editor.setSelectionRange(newPos, newPos);
+                editor.focus();
+            }
+
+            statusSpan.textContent = '✔ ' + data.filename;
+            statusSpan.style.color = '#2a7a2a';
+
+            // Clear status after 4 seconds
+            setTimeout(function () {
+                statusSpan.textContent = '';
+                fileInput.value = '';
+            }, 4000);
+        })
+        .catch(function (err) {
+            statusSpan.textContent = 'Upload failed';
+            statusSpan.style.color = '#c0392b';
+            console.error(err);
+        });
+    });
+}());
+</script>
