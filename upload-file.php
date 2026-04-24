@@ -12,7 +12,7 @@
  *
  * Installation:
  *   1. Place upload-file.php in the HTMLy root directory (same level as index.php).
- *   2. Apply the editor patch from add-content.patch.php to:
+ *   2. Apply the editor patch from add-content.patch.html to:
  *        system/admin/views/add-content.html.php
  *        system/admin/views/edit-content.html.php
  *        system/admin/views/add-page.html.php
@@ -21,7 +21,7 @@
  * @package  htmly-media-upload
  * @author   TestDesk
  * @link     https://github.com/testdesk/htmly-media-upload
- * @version  1.0.0
+ * @version  1.0.1
  * @requires HTMLy v3.1.1+
  * @license  GPL-2.0
  */
@@ -66,6 +66,7 @@ $allowed = [
     'audio/flac'       => 'flac',
     'audio/x-flac'     => 'flac',
     'audio/mp4'        => 'm4a',
+    'audio/x-m4a'      => 'm4a',
     'video/mp4'        => 'mp4',
     'video/webm'       => 'webm',
     'video/ogg'        => 'ogv',
