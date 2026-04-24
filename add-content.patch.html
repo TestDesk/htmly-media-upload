@@ -4,7 +4,7 @@
     @package  htmly-media-upload
     @author   TestDesk
     @link     https://github.com/testdesk/htmly-media-upload
-    @version  1.0.0
+    @version  1.0.1
     @requires HTMLy v3.1.1+
     @license  GPL-2.0
 
@@ -51,6 +51,20 @@
 
     if (!fileInput) return;
 
+    // Correct MIME types for browser <source> tags
+    var mimeMap = {
+        'mp3':  'audio/mpeg',
+        'ogg':  'audio/ogg',
+        'wav':  'audio/wav',
+        'aac':  'audio/aac',
+        'flac': 'audio/flac',
+        'm4a':  'audio/mp4',
+        'mp4':  'video/mp4',
+        'webm': 'video/webm',
+        'ogv':  'video/ogg',
+        'mov':  'video/quicktime'
+    };
+
     fileInput.addEventListener('change', function () {
         var file = this.files[0];
         if (!file) return;
@@ -76,13 +90,14 @@
             var tag  = '';
             var path = data.path;
             var name = file.name.replace(/\.[^.]+$/, '');
+            var mime = mimeMap[data.ext] || data.type + '/' + data.ext;
 
             if (data.type === 'pdf') {
                 tag = '<a href="' + path + '" target="_blank">' + name + '</a>';
             } else if (data.type === 'audio') {
-                tag = '<audio controls>\n  <source src="' + path + '" type="audio/' + data.ext + '">\n</audio>';
+                tag = '<audio controls>\n  <source src="' + path + '" type="' + mime + '">\n</audio>';
             } else if (data.type === 'video') {
-                tag = '<video controls style="max-width:100%">\n  <source src="' + path + '" type="video/' + data.ext + '">\n</video>';
+                tag = '<video controls style="max-width:100%">\n  <source src="' + path + '" type="' + mime + '">\n</video>';
             }
 
             // Insert tag at cursor position in the Markdown editor
