@@ -74,6 +74,12 @@ If the first upload fails with `Error: Could not save file`, create the director
 
 ---
 
+## Post Types
+
+Use a **Regular post** to embed audio, video or PDF files via the upload button. The dedicated "Audio post" and "Video post" types in HTMLy are designed for SoundCloud and YouTube links respectively and are not required for this extension.
+
+---
+
 ## PHP Upload Limits
 
 By default, PHP limits file uploads. If you get the error `File exceeds upload_max_filesize in php.ini`, you need to increase the limits on your server.
@@ -139,6 +145,10 @@ Only files whose actual MIME type matches a known safe format are accepted and s
 ---
 
 ## Changelog
+
+### 1.0.1
+- Fixed: `audio/x-m4a` MIME type now accepted for M4A uploads
+- Fixed: Correct MIME types used in `<source>` tags for all audio and video formats
 
 ### 1.0.0
 - Initial release
